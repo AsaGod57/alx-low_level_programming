@@ -21,7 +21,9 @@ int main(void)
 					putchar(k);
 					putchar(l);
 
+
 					if (j != '7')
+
 					{
 						putchar(',');
 						putchar(' ');
