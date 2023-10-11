@@ -4,7 +4,7 @@
   * print_sign - Start point
   * @n: Specifies the number to be checked
   *
-  * Return: 1 for positive num, -1 for negative num or zero for anything else
+  * Return: 1 for positive num, -1 for negative num or 0 for others (Ends)
   */
 int print_sign(int n)
 {
