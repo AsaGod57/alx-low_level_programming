@@ -2,7 +2,7 @@
 #define LARGEST 10000000000
 /**
  * main - Start point
- * Specification: Find and print the first 98 fib numbers starting with 1 and 2.
+ * Specification: Pprint the first 98 fib numbers starting with 1 and 2.
  * Coma and space separated numbers
  * Return: 0 (Ends)
  */
