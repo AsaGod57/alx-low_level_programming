@@ -1,5 +1,5 @@
 #include "Main.h"
-
+#include <stdio.h>
 /**
   * _memset - Start point
   * @s: Specifies memory area to fill
