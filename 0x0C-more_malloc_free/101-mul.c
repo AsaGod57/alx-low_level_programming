@@ -3,124 +3,208 @@
 #include <stdio.h>
 
 /**
- * check_num - Start point
- * @st: Specifies the string to be passed
- * Return: 1 for number 0 if otherwise (Ends)
+ * find_len - Start point
+ * @str: Specifies the string to be measured
+ * Return: The length of the string (Ends)
  */
-int check_num(char *st)
+int find_len(char *str)
 {
-	int a;
+	int len = 0;
 
-	for (a = 0; st[a] != '\0'; a++)
+	while (*str++)
+		len++;
+
+	return (len);
+}
+
+/**
+ * create_xarray - Start point
+ * @size: Specifies the size of the array
+ * Return: A pointer (Ends)
+ */
+char *create_xarray(int size)
+{
+	char *array;
+	int index;
+
+	array = malloc(sizeof(char) * size);
+
+	if (array == NULL)
+		exit(98);
+
+	for (index = 0; index < (size - 1); index++)
+		array[index] = 'x';
+
+	array[index] = '\0';
+
+	return (array);
+}
+
+/**
+ * iterate_zeroes - Start point
+ * @str: Specifies the string of numbers to iterate through
+ * Return: A pointer (Ends)
+ */
+char *iterate_zeroes(char *str)
+{
+	while (*str && *str == '0')
+		str++;
+
+	return (str);
+}
+
+/**
+ * get_digit - Start point
+ * @c: Specifies the character to be converted
+ * Return: The converted int (Ends)
+ */
+int get_digit(char c)
+{
+	int digit = c - '0';
+
+	if (digit < 0 || digit > 9)
 	{
-		if (st[a] < '0' || st[a] > '9')
-			return (0);
+		printf("Error\n");
+		exit(98);
 	}
-	return (1);
+
+	return (digit);
 }
 
 /**
- * string_length - Start point
- * @str: Specifes the string to check
- * Return: The count
+ * get_prod - Start point
+ * @prod: Specifies the buffer to store the result
+ * @mult: Specifies the string of numbers
+ * @digit: Specifies the single digit
+ * @zeroes: Specifies the necessary number of leading zeros
  */
-unsigned int string_length(char *str)
+void get_prod(char *prod, char *mult, int digit, int zeroes)
 {
-	int a;
+	int mult_len, num, tens = 0;
 
-	for (a = 0; str[a] != '\0'; a++)
-		a++;
-	return (a);
-}
+	mult_len = find_len(mult) - 1;
+	mult += mult_len;
 
-/**
- * print_string - Start point
- * @st: Specifies the string to print
- * Return: Nothing (Ends)
- */
-void print_string(char *st)
-{
-	while (*st == '\0')
-		st++;
-	if (*st == '\0')
-		_putchar('0');
-	while (*st == '0')
-		st++;
-	while (*st != '\0')
+	while (*prod)
 	{
-		_putchar(*st);
-		st++;
+		*prod = 'x';
+		prod++;
 	}
-	_putchar('\n');
+
+	prod--;
+
+	while (zeroes--)
+	{
+		*prod = '0';
+		prod--;
+	}
+
+	for (; mult_len >= 0; mult_len--, mult--, prod--)
+	{
+		if (*mult < '0' || *mult > '9')
+		{
+			printf("Error\n");
+			exit(98);
+		}
+
+		num = (*mult - '0') * digit;
+		num += tens;
+		*prod = (num % 10) + '0';
+		tens = num / 10;
+	}
+
+	if (tens)
+		*prod = (tens % 10) + '0';
 }
 
 /**
- * _calloc - Start point
- * @number: Specifies the number
- * @size: Specifies the size
- * Return: The pointer to memory (Ends)
+ * add_nums - Start point
+ * @final_prod: Specifies the buffer store the final product
+ * @next_prod: Specifes the next product to be added
+ * @next_len: Specifies the length of next_prod
  */
-void *_calloc(unsigned int number, unsigned int size)
+void add_nums(char *final_prod, char *next_prod, int next_len)
 {
-	char *p;
-	unsigned int a;
+	int num, tens = 0;
 
-	if (number == 0 || size == 0)
-		return (NULL);
-	p = malloc(number * size);
-	if (p == 0)
-		return (NULL);
-	for (a = 0; a < (number * size); a++)
-		p[a] = 0;
-	return (p);
+	while (*(final_prod + 1))
+		final_prod++;
+
+	while (*(next_prod + 1))
+		next_prod++;
+
+	for (; *final_prod != 'x'; final_prod--)
+	{
+		num = (*final_prod - '0') + (*next_prod - '0');
+		num += tens;
+		*final_prod = (num % 10) + '0';
+		tens = num / 10;
+
+		next_prod--;
+		next_len--;
+	}
+
+	for (; next_len >= 0 && *next_prod != 'x'; next_len--)
+	{
+		num = (*next_prod - '0');
+		num += tens;
+		*final_prod = (num % 10) + '0';
+		tens = num / 10;
+
+		final_prod--;
+		next_prod--;
+	}
+
+	if (tens)
+		*final_prod = (tens % 10) + '0';
 }
 
 /**
  * main - Start point
- * @argc: Specifies the number of arguments passed
- * @argv: Specifies the argument variables
+ * @argv: Specifies the number of arguments passed to the program
+ * @argc: Specifies An array of pointers to the arguments
  * Return: 0 Always (Ends)
  */
-int main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
-	char *n1, *n2, *multi_res;
-	unsigned int l = 0, l1 = 0, l2 = 0, a, b, t = 0, c = 0, ten = 0;
+	char *final_prod, *next_prod;
+	int size, index, digit, zeroes = 0;
 
-	if (argc < 3)
+	if (argc != 3)
 	{
-		print_string("Error");
+		printf("Error\n");
 		exit(98);
 	}
-	n1 = argv[1];
-	n2 = argv[2];
-	if (!(check_num(n1) && check_num(n2)))
+
+	if (*(argv[1]) == '0')
+		argv[1] = iterate_zeroes(argv[1]);
+	if (*(argv[2]) == '0')
+		argv[2] = iterate_zeroes(argv[2]);
+	if (*(argv[1]) == '\0' || *(argv[2]) == '\0')
 	{
-		print_string("Error");
-		exit(98);
+		printf("0\n");
+		return (0);
 	}
-	l1 = string_length(n1);
-	l2 = string_length(n2);
-	l = l1 + l2;
-	multi_res = _calloc(l + 1, sizeof(char *));
-	if (multi_res == 0)
+
+	size = find_len(argv[1]) + find_len(argv[2]);
+	final_prod = create_xarray(size + 1);
+	next_prod = create_xarray(size + 1);
+
+	for (index = find_len(argv[2]) - 1; index >= 0; index--)
 	{
-		print_string("Error");
-		exit(98);
+		digit = get_digit(*(argv[2] + index));
+		get_prod(next_prod, argv[1], digit, zeroes++);
+		add_nums(final_prod, next_prod, size - 1);
 	}
-	for (a = 0; a < l1; a++, ten++)
+	for (index = 0; final_prod[index]; index++)
 	{
-		for (c = 0, b = 0; b < l2; b++)
-		{
-			t = (n1[l1 - a - 1] - '0') * (n2[l2 - b - 1] - '0') + c;
-			printf("%u\n", t);
-			if (multi_res[l - b - ten - 1] > 0)
-				t = t + multi_res[l - b - ten - 1] - '0';
-			multi_res[l - b - ten - 1] = t % 10 + '0';
-			c = t / 10;
-		}
-		multi_res[l - b - ten - 1] += c + '0';
+		if (final_prod[index] != 'x')
+			putchar(final_prod[index]);
 	}
-	print_string(multi_res);
-	free(multi_res);
+	putchar('\n');
+
+	free(next_prod);
+	free(final_prod);
+
 	return (0);
 }
